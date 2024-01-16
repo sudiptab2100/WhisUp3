@@ -7,10 +7,10 @@ import {
   bytesToUtf8,
   LightNode,
   Protocols,
+  PageDirection,
 } from "@waku/sdk";
-import { useState } from "react";
 
-const ContentTopic = "whis-up-3/user/";
+const ContentTopic = "test-whis-up-3/user/";
 const SimpleMessage = new protobuf.Type("SimpleMessage")
   .add(new protobuf.Field("timestamp", 1, "uint32"))
   .add(new protobuf.Field("text", 2, "string"));
@@ -40,8 +40,27 @@ async function SendMessage(waku: LightNode, to: string, msg: string) {
   const payload = SimpleMessage.encode(protoMsg).finish();
   const encoder = createEncoder({ contentTopic: ContentTopic + to });
   const x = await waku.lightPush.send(encoder, { payload });
-  console.log(x);
+  console.log(x.errors);
+  console.log(x.recipients[0].toString());
+  const decoder = createDecoder(ContentTopic + to);
+  // Create the store query
+  const storeQuery = waku.store.queryGenerator([decoder]);
 
+  // Process the messages
+  for await (const messagesPromises of storeQuery) {
+    // Fulfil the messages promises
+    const messages = await Promise.all(
+      messagesPromises.map(async (p) => {
+        const msg = await p;
+        // Render the message/payload in your application
+        // console.log(msg);
+        if (msg && msg.payload) {
+            const payload = SimpleMessage.decode(msg.payload);
+            console.log(payload);
+        }
+      })
+    );
+  }
   return true;
 }
 
