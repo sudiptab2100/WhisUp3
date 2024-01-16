@@ -1,4 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
+import { LightNode } from "@waku/sdk";
 
 type Inputs = {
   example: string;
@@ -7,10 +8,11 @@ type Inputs = {
 
 interface Props {
   user: string;
-  onClickSend: (to: string, msg: string) => boolean;
+  waku?: LightNode;
+  onClickSend: (waku: LightNode, to: string, msg: string) => Promise<boolean>;
 }
 
-export default function SenderForm({ user, onClickSend }: Props) {
+export default function SenderForm({ user, waku, onClickSend }: Props) {
   const {
     register,
     handleSubmit,
@@ -22,7 +24,7 @@ export default function SenderForm({ user, onClickSend }: Props) {
     // console.log(data.exampleRequired)
     const to = data.example;
     const msg = data.exampleRequired;
-    onClickSend(to, msg)
+    if(waku) onClickSend(waku, to, msg)
   }
 
   // console.log(watch("example")); // watch input value by passing the name of it
