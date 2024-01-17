@@ -23,6 +23,7 @@ const initWaku = async (user: string) => {
     Protocols.LightPush,
     Protocols.Store,
   ]);
+	await subscribeToContent(user, waku);
   console.log("Waku Connected");
 
   return waku;
@@ -53,15 +54,29 @@ async function SendMessage(waku: LightNode, to: string, msg: string) {
       messagesPromises.map(async (p) => {
         const msg = await p;
         // Render the message/payload in your application
-        // console.log(msg);
-        if (msg && msg.payload) {
-            const payload = SimpleMessage.decode(msg.payload);
-            console.log(payload);
-        }
+        console.log(decodeSimpleMessage(msg))
       })
     );
   }
   return true;
+}
+
+async function subscribeToContent(user: string, waku: LightNode) {
+	const printMsg = (msg: any) => {
+		console.log(decodeSimpleMessage(msg));
+	}
+	const decoder = createDecoder(ContentTopic + user);
+	waku.filter.subscribe(
+		decoder,
+		printMsg
+	)
+}
+
+function decodeSimpleMessage(msg: any) {
+	if (msg && msg.payload) {
+		return SimpleMessage.decode(msg.payload);
+	}
+	return null;
 }
 
 export { initWaku, SendMessage };
