@@ -23,7 +23,7 @@ const initWaku = async (user: string) => {
     Protocols.LightPush,
     Protocols.Store,
   ]);
-	await subscribeToContent(user, waku);
+	await subscribeToContent(waku, user);
   console.log("Waku Connected");
 
   return waku;
@@ -43,7 +43,23 @@ async function SendMessage(waku: LightNode, to: string, msg: string) {
   const x = await waku.lightPush.send(encoder, { payload });
   console.log(x.errors);
   console.log(x.recipients[0].toString());
-  const decoder = createDecoder(ContentTopic + to);
+	await getStoredMessage(waku, to);
+  return true;
+}
+
+async function subscribeToContent(waku: LightNode, user: string) {
+	const printMsg = (msg: any) => {
+		console.log(decodeSimpleMessage(msg));
+	}
+	const decoder = createDecoder(ContentTopic + user);
+	waku.filter.subscribe(
+		decoder,
+		printMsg
+	)
+}
+
+async function getStoredMessage(waku: LightNode, user: string) {
+	const decoder = createDecoder(ContentTopic + user);
   // Create the store query
   const storeQuery = waku.store.queryGenerator([decoder]);
 
@@ -54,22 +70,11 @@ async function SendMessage(waku: LightNode, to: string, msg: string) {
       messagesPromises.map(async (p) => {
         const msg = await p;
         // Render the message/payload in your application
+				console.log(msg?.timestamp)
         console.log(decodeSimpleMessage(msg))
       })
     );
   }
-  return true;
-}
-
-async function subscribeToContent(user: string, waku: LightNode) {
-	const printMsg = (msg: any) => {
-		console.log(decodeSimpleMessage(msg));
-	}
-	const decoder = createDecoder(ContentTopic + user);
-	waku.filter.subscribe(
-		decoder,
-		printMsg
-	)
 }
 
 function decodeSimpleMessage(msg: any) {
