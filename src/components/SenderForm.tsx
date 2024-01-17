@@ -2,17 +2,17 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { LightNode } from "@waku/sdk";
 
 type Inputs = {
-  example: string;
-  exampleRequired: string;
+  to: string;
+  message: string;
 };
 
 interface Props {
-  user: string;
+  to: string;
   waku?: LightNode;
   onClickSend: (waku: LightNode, to: string, msg: string) => Promise<boolean>;
 }
 
-export default function SenderForm({ user, waku, onClickSend }: Props) {
+export default function SenderForm({ to, waku, onClickSend }: Props) {
   const {
     register,
     handleSubmit,
@@ -22,8 +22,8 @@ export default function SenderForm({ user, waku, onClickSend }: Props) {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     // console.log(data.example)
     // console.log(data.exampleRequired)
-    const to = data.example;
-    const msg = data.exampleRequired;
+    const to = data.to;
+    const msg = data.message;
     if(waku) onClickSend(waku, to, msg)
   }
 
@@ -33,12 +33,12 @@ export default function SenderForm({ user, waku, onClickSend }: Props) {
     /* "handleSubmit" will validate your inputs before invoking "onSubmit" */
     <form onSubmit={handleSubmit(onSubmit)}>
       {/* register your input into the hook by invoking the "register" function */}
-      <input defaultValue={user} {...register("example")} />
+      <input defaultValue={to} {...register("to")} />
 
       {/* include validation with required or other standard HTML validation rules */}
-      <input {...register("exampleRequired", { required: true })} />
+      <input {...register("message", { required: true })} />
       {/* errors will return when field validation fails  */}
-      {errors.exampleRequired && <span>This field is required</span>}
+      {errors.message && <span>This field is required</span>}
 
       <input type="submit" value="Send"/>
     </form>

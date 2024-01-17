@@ -1,27 +1,31 @@
 import React, { useEffect, useState } from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { initWaku, SendMessage } from "./components/Waku";
+import { initWaku, sendMessage } from "./components/Waku";
 import { LightNode } from "@waku/sdk";
 import SenderForm from "./components/SenderForm";
 
 function App() {
   const queryParameters = new URLSearchParams(window.location.search);
-  const user = queryParameters.get("user")?.toString();
-  console.log(user);
+  const to = (queryParameters.get("to") || '').toString();
+  console.log(to);
   const [waku, setWaku] = useState<LightNode>();
+  const [status, setStatus] = useState<string>("Connecting...");
   useEffect(() => {
     const init = async () => {
-      const node = await initWaku(user || "");
+      const node = await initWaku();
       setWaku(node);
+      if(waku?.isConnected()) setStatus("Connected");
     };
     init();
   });
-    
+
   return (
     <div className="App">
       <header className="App-header">
-        <SenderForm user={user || ""} waku={waku} onClickSend={SendMessage} />
+        <h1>Waku Chat</h1>
+        <h2>{status}</h2>
+        <SenderForm to={to} waku={waku} onClickSend={sendMessage} />
       </header>
     </div>
   );
