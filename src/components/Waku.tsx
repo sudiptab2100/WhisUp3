@@ -4,10 +4,8 @@ import {
   waitForRemotePeer,
   createEncoder,
   createDecoder,
-  bytesToUtf8,
   LightNode,
   Protocols,
-  PageDirection,
 } from "@waku/sdk";
 
 const ContentTopic = "test-whis-up-3/user/";
@@ -16,6 +14,8 @@ const SimpleMessage = new protobuf.Type("SimpleMessage")
   .add(new protobuf.Field("text", 2, "string"));
 
 const initWaku = async (user: string) => {
+	const currentUser = await initMetamask();
+	console.log(currentUser);
   const waku = await createLightNode({ defaultBootstrap: true });
   await waku.start();
   await waitForRemotePeer(waku, [
@@ -80,6 +80,15 @@ async function getStoredMessage(waku: LightNode, user: string) {
 function decodeSimpleMessage(msg: any) {
 	if (msg && msg.payload) {
 		return SimpleMessage.decode(msg.payload);
+	}
+	return null;
+}
+
+async function initMetamask() {
+	const ethereum = (window as any).ethereum;
+	if (ethereum) {
+		const users = await ethereum.request({ method: "eth_requestAccounts" });
+		return users[0];
 	}
 	return null;
 }
