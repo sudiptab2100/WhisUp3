@@ -8,7 +8,7 @@ import {
   Protocols,
 } from "@waku/sdk";
 
-const ContentTopic = "test1-whis-up-3/user/";
+const ContentTopic = "test2-whis-up-3/user/";
 
 const SimpleMessage = new protobuf.Type("SimpleMessage").add(
   new protobuf.Field("text", 2, "string")
@@ -22,13 +22,11 @@ interface MessagePair {
 const initWaku = async () => {
   const waku = await createLightNode({ defaultBootstrap: true });
   await waku.start();
-  if (waku.isStarted()) console.log("Waku Started");
   await waitForRemotePeer(waku, [
     Protocols.Filter,
     Protocols.LightPush,
     Protocols.Store,
   ]);
-  if (waku.isConnected()) console.log("Waku Connected");
 
   return waku;
 };
@@ -51,6 +49,7 @@ async function sendMessage(waku: LightNode, to: string, msg: string) {
     console.log(x.errors);
     return false;
   }
+	console.log(x.recipients);
   return true;
 }
 

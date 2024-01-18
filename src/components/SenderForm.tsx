@@ -22,7 +22,7 @@ export default function SenderForm({ to, waku, onClickSend }: Props) {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     // console.log(data.example)
     // console.log(data.exampleRequired)
-    const to = data.to;
+    const to = data.to.toLowerCase();
     const msg = data.message;
     if(waku) onClickSend(waku, to, msg)
   }
