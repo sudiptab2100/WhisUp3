@@ -18,6 +18,17 @@ function App() {
   const [waku, setWaku] = useState<LightNode>();
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
+  const [userLink, setUserLink] = useState("");
+
+  useEffect(() => {
+    const setuser = async () => {
+      const u = (await initMetamask()).toLowerCase();
+      const link = "/?to=" + u;
+      setUserLink(link);
+    }
+    setuser();
+  });
+
   useEffect(() => {
     const init = async () => {
       const node = await initWaku();
@@ -32,6 +43,7 @@ function App() {
       <header className="App-header">
         <h1>WhisUp3</h1>
         <h2>{status}</h2>
+        <h3>Link: <a href={userLink} target="_blank">Click</a></h3>
         <SenderForm to={to} waku={waku} onClickSend={sendMessage} />
         <button onClick={async () => setMessageComp(await getStoredMessagesComponent(waku!))}>Get Messages</button>
         <ul>{messageComp}</ul>
