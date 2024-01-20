@@ -14,7 +14,6 @@ import SenderForm from "./components/SenderForm";
 function App() {
   const queryParameters = new URLSearchParams(window.location.search);
   const to = (queryParameters.get("to") || "").toString().toLowerCase();
-  console.log(to);
   const [waku, setWaku] = useState<LightNode>();
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
@@ -32,11 +31,18 @@ function App() {
   useEffect(() => {
     const init = async () => {
       const node = await initWaku();
-      setWaku(node);
-      if (waku?.isConnected()) setStatus("Connected");
+      if (node) {
+        setWaku(node);
+        setStatus("Connected");
+      }
     };
     init();
   });
+
+  // Account change reload
+  (window as any).ethereum.on('accountsChanged', () => {
+    window.location.reload();
+  })
 
   return (
     <div className="App">
@@ -56,9 +62,7 @@ export default App;
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
   const user = (await initMetamask()).toLowerCase();
-  // console.log("The user: " + user);
   const messagePairs = await getStoredMessage(waku, user!);
-  // console.log(messagePairs);
   const listItems = messagePairs.map(message => <li>{message.message}</li>);
   return listItems;
 };

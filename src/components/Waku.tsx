@@ -28,12 +28,12 @@ const initWaku = async () => {
     Protocols.Store,
   ]);
 
-  return waku;
+  if(waku.isConnected()) return waku;
+  return null;
 };
 
 async function sendMessage(waku: LightNode, to: string, msg: string) {
   console.log("You're in Waku.");
-  console.log(to + "\n" + msg);
 
   const timestamp = new Date().getTime();
   const protoMsg = SimpleMessage.create({
@@ -49,7 +49,9 @@ async function sendMessage(waku: LightNode, to: string, msg: string) {
     console.log(x.errors);
     return false;
   }
-	console.log(x.recipients);
+	// console.log(x.recipients);
+
+  console.log("Message Sent:\n" + to + "\n" + msg);
   return true;
 }
 
