@@ -12,7 +12,8 @@ import SenderForm from "./components/SenderForm";
 import * as sigUtil from "@metamask/eth-sig-util";
 import * as ethUtil from "ethereumjs-util";
 import { getWeb3, getAccount, getPublicKey } from "./components/MetaMask";
-import { Buffer } from "buffer";
+// import { Buffer } from "buffer";
+import { encryptEC, decryptEC } from "./components/Crypt";
 
 function App() {
   const queryParameters = new URLSearchParams(window.location.search);
@@ -74,17 +75,27 @@ function App() {
           Get Messages
         </button>
         <ul>{messageComp}</ul>
-        <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Set Public Key</button>
+        <button
+          onClick={async () =>
+            setPubKey(await getPublicKey(web3, userLink.substring(5)))
+          }
+        >
+          Set Public Key
+        </button>
         <input
           type="text"
           id="message"
           onChange={(e) => setTxt(e.target.value)}
         />
-        <button onClick={async () => setCipTxt(await encrypt(pubKey, txt))}>
+        <button onClick={async () => setCipTxt(await encryptEC(pubKey, txt))}>
           Encrypt
         </button>
         <input type="text" id="cipher" value={cipTxt} />
-        <button onClick={async () => setDecTxt(await decrypt(web3, userLink.substring(5), cipTxt))}>
+        <button
+          onClick={async () =>
+            setDecTxt(await decryptEC(web3, userLink.substring(5), cipTxt))
+          }
+        >
           Decrypt
         </button>
         <input type="text" id="decrypted" value={decTxt} />
