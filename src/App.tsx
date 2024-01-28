@@ -5,18 +5,21 @@ import {
   initWaku,
   sendMessage,
   getStoredMessage,
-  initMetamask,
   MessagePair,
 } from "./components/Waku";
 import { LightNode } from "@waku/sdk";
 import SenderForm from "./components/SenderForm";
 import * as sigUtil from "@metamask/eth-sig-util";
 import * as ethUtil from "ethereumjs-util";
+import { getWeb3, getAccount, getPublicKey } from "./components/MetaMask";
+import { Buffer } from "buffer";
 
 function App() {
   const queryParameters = new URLSearchParams(window.location.search);
   const to = (queryParameters.get("to") || "").toString().toLowerCase();
   const [waku, setWaku] = useState<LightNode>();
+  const [web3, setWeb3] = useState<any>();
+  const [pubKey, setPubKey] = useState<string>("");
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
   const [userLink, setUserLink] = useState("");
@@ -26,7 +29,9 @@ function App() {
 
   useEffect(() => {
     const setuser = async () => {
-      const u = (await initMetamask()).toLowerCase();
+      const w3 = await getWeb3();
+      setWeb3(w3);
+      const u = (await getAccount(w3)).toLowerCase();
       const link = "/?to=" + u;
       setUserLink(link);
     };
@@ -69,11 +74,20 @@ function App() {
           Get Messages
         </button>
         <ul>{messageComp}</ul>
-        <input type="text" id="message" onChange={(e) => setTxt(e.target.value)}/>
-        <button onClick={async () => setCipTxt(await test_eth(txt))}>Encrypt</button>
-        <input type="text" id="cipher" value={cipTxt}/>
-        <button onClick={async () => setDecTxt(await test_eth2(cipTxt))}>Decrypt</button>
-        <input type="text" id="decrypted" value={decTxt}/>
+        <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Set Public Key</button>
+        <input
+          type="text"
+          id="message"
+          onChange={(e) => setTxt(e.target.value)}
+        />
+        <button onClick={async () => setCipTxt(await encrypt(pubKey, txt))}>
+          Encrypt
+        </button>
+        <input type="text" id="cipher" value={cipTxt} />
+        <button onClick={async () => setDecTxt(await decrypt(web3, userLink.substring(5), cipTxt))}>
+          Decrypt
+        </button>
+        <input type="text" id="decrypted" value={decTxt} />
       </header>
     </div>
   );
@@ -82,31 +96,12 @@ function App() {
 export default App;
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
-  const user = (await initMetamask()).toLowerCase();
+  const w3 = await getWeb3();
+  const user = (await getAccount(w3)).toLowerCase();
   const messagePairs = await getStoredMessage(waku, user!);
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);
   return listItems;
 };
-
-const test_eth = async (message: string) => {
-  const account = (await initMetamask()).toLowerCase();
-  const web3 = (window as any).ethereum;
-  const pubKey = await web3.request({
-    method: "eth_getEncryptionPublicKey",
-    params: [account],
-  });
-  // const pubKey = "Qas1GGGTn6KDwA8BNOyILNT0RQbdUwmVTaJ+jW5eZ38=";
-  console.log(pubKey);
-  const encrypted = encrypt(pubKey, message);
-  return encrypted;
-};
-
-const test_eth2 = async (cipher: string) => {
-  const account = (await initMetamask()).toLowerCase();
-  const web3 = (window as any).ethereum;
-  const decrypted = await decrypt(web3, account, cipher);
-  return decrypted;
-}
 
 const encrypt = (publicKey: string, text: string) => {
   window.Buffer = Buffer;
@@ -115,7 +110,7 @@ const encrypt = (publicKey: string, text: string) => {
     data: text,
     version: "x25519-xsalsa20-poly1305",
   });
-  
+
   return ethUtil.bufferToHex(Buffer.from(JSON.stringify(result), "utf8"));
 };
 

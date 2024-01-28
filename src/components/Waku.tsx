@@ -97,19 +97,9 @@ function decodeSimpleMessage(msg: any) {
   return null;
 }
 
-async function initMetamask() {
-  const ethereum = (window as any).ethereum;
-  if (ethereum) {
-    const users = await ethereum.request({ method: "eth_requestAccounts" });
-    return users[0];
-  }
-  return null;
-}
-
 export {
   initWaku,
   sendMessage,
-  initMetamask,
   subscribeToContent,
   getStoredMessage,
 };
