@@ -28,7 +28,7 @@ const initWaku = async () => {
     Protocols.Store,
   ]);
 
-  if(waku.isConnected()) return waku;
+  if (waku.isConnected()) return waku;
   return null;
 };
 
@@ -49,7 +49,7 @@ async function sendMessage(waku: LightNode, to: string, msg: string) {
     console.log(x.errors);
     return false;
   }
-	// console.log(x.recipients);
+  // console.log(x.recipients);
 
   console.log("Message Sent:\n" + to + "\n" + msg);
   return true;
@@ -97,11 +97,6 @@ function decodeSimpleMessage(msg: any) {
   return null;
 }
 
-export {
-  initWaku,
-  sendMessage,
-  subscribeToContent,
-  getStoredMessage,
-};
+export { initWaku, sendMessage, subscribeToContent, getStoredMessage };
 
 export type { MessagePair };
