@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
+import { useEffect, useState } from "react";
 import "./App.css";
 import {
   initWaku,
   sendMessage,
-  getStoredMessage,
-  MessagePair,
+  getStoredMessage
 } from "./components/Waku";
 import { LightNode } from "@waku/sdk";
 import SenderForm from "./components/SenderForm";
-import * as sigUtil from "@metamask/eth-sig-util";
-import * as ethUtil from "ethereumjs-util";
 import { getWeb3, getAccount, getPublicKey } from "./components/MetaMask";
-// import { Buffer } from "buffer";
 import { encryptEC, decryptEC } from "./components/Crypt";
 
 function App() {
@@ -112,24 +107,4 @@ const getStoredMessagesComponent = async (waku: LightNode) => {
   const messagePairs = await getStoredMessage(waku, user!);
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);
   return listItems;
-};
-
-const encrypt = (publicKey: string, text: string) => {
-  window.Buffer = Buffer;
-  const result = sigUtil.encrypt({
-    publicKey,
-    data: text,
-    version: "x25519-xsalsa20-poly1305",
-  });
-
-  return ethUtil.bufferToHex(Buffer.from(JSON.stringify(result), "utf8"));
-};
-
-const decrypt = async (web3: any, account: string, text: string) => {
-  const result = await web3.request({
-    method: "eth_decrypt",
-    params: [text, account],
-  });
-
-  return result;
 };
