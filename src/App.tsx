@@ -7,7 +7,7 @@ import {
 } from "./components/Waku";
 import { LightNode } from "@waku/sdk";
 import SenderForm from "./components/SenderForm";
-import { getWeb3, getAccount, getPublicKey } from "./components/MetaMask";
+import { getWeb3, getAccount, getPublicKey, switchChain } from "./components/MetaMask";
 import { encryptEC, decryptEC } from "./components/Crypt";
 
 function App() {
@@ -103,6 +103,7 @@ export default App;
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
   const w3 = await getWeb3();
+  await switchChain(w3);
   const user = (await getAccount(w3)).toLowerCase();
   const messagePairs = await getStoredMessage(waku, user!);
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);

@@ -25,4 +25,13 @@ async function getPublicKey(web3: any, account: string) {
   return null;
 }
 
-export { getWeb3, getAccount, getPublicKey };
+async function switchChain(web3: any) {
+  if (web3) {
+    await web3.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0xaa36a7" }], // Sepolia Testnet
+    });
+  }
+}
+
+export { getWeb3, getAccount, getPublicKey, switchChain };
