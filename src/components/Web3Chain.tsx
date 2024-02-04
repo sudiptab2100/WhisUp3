@@ -15,4 +15,11 @@ async function getContract(web3: any, contractAddress: string) {
   return null;
 }
 
-export { getWeb3Chain, getContract };
+async function setPubKey(contract: any, account: string, pubKey: string) {
+  if (contract) {
+    const result = await contract.methods.setPubKey(pubKey).send({ from: account });
+    console.log(result);
+  }
+}
+
+export { getWeb3Chain, getContract, setPubKey };
