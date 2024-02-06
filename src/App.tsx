@@ -126,18 +126,7 @@ const connectMetaMask = async (
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
   const w3 = await getWeb3();
-  await switchChain(w3);
-  const w3Chain = await getWeb3Chain(w3);
-  const contract = await getContract(
-    w3Chain,
-    "0xf44f4a08786BDD99A30b1765467f41b32650A6A4"
-  );
-  console.log(contract);
   const user = (await getAccount(w3)).toLowerCase();
-  const pk = await getPubKeyChain(contract, user);
-  console.log(pk);
-  if (pk! === "")
-    await setPubKeyChain(contract, user, await getPublicKey(w3, user));
   const messagePairs = await getStoredMessage(waku, user!);
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);
   return listItems;
