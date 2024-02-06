@@ -68,9 +68,9 @@ function App() {
         <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Get Pub Enc Key From MetaMask</button>
         <button onClick={async () => setPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5), pubKey)}>Publish On-Chain</button>
         <br></br>
-        <button onClick={async () => setToPubKey(await getPubKeyChain(await getContract(web3Chain, contractAddress), to))}>Get To Pub Enc Key (On-Chain)</button>
+        <button onClick={async () => setToPubKey(await getPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5)))}>Get Pub Enc Key (On-Chain)</button>
         <h4>To Public Enc. Key: {toPubKey}</h4>
-        <SenderForm to={to} waku={waku} onClickSend={sendMessage} />
+        <SenderForm to={to} waku={waku} onClickSend={sendMessageEnc} />
         <button
           onClick={async () =>
             setMessageComp(await getStoredMessagesComponent(waku!))
@@ -131,3 +131,12 @@ const getStoredMessagesComponent = async (waku: LightNode) => {
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);
   return listItems;
 };
+
+const sendMessageEnc = async (waku: LightNode, to: string, txt: string) => {
+  const web3Chain = await getWeb3Chain(await getWeb3());
+  const contractAddress = "0xf44f4a08786BDD99A30b1765467f41b32650A6A4";
+  const toPubKey = await getPubKeyChain(await getContract(web3Chain, contractAddress), to);
+  const cipTxt = await encryptEC(toPubKey, txt);
+  const res = await sendMessage(waku, to, cipTxt);
+  return res;
+}
