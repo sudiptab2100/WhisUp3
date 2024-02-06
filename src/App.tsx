@@ -22,6 +22,7 @@ function App() {
   const to = (queryParameters.get("to") || "").toString().toLowerCase();
   const [waku, setWaku] = useState<LightNode>();
   const [web3, setWeb3] = useState<any>();
+  const [web3Chain, setWeb3Chain] = useState<any>();
   const [pubKey, setPubKey] = useState<string>("");
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
@@ -46,12 +47,14 @@ function App() {
     window.location.reload();
   });
 
+  const contractAddress = "0xf44f4a08786BDD99A30b1765467f41b32650A6A4";
+
   return (
     <div className="App">
       <header className="App-header">
         <h1>WhisUp3</h1>
         <h2>{status}</h2>
-        <button onClick={async () => connectMetaMask(setWeb3, setUserLink)}>
+        <button onClick={async () => connectMetaMask(setWeb3, setUserLink, setWeb3Chain)}>
           Connect MetaMask
         </button>
         <h4>User: {userLink.substring(5)}</h4>
@@ -61,6 +64,8 @@ function App() {
             Click
           </a>
         </h3>
+        <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Get Pub Enc Key From MetaMask</button>
+        <button onClick={async () => setPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5), pubKey)}>Publish On-Chain</button>
         <SenderForm to={to} waku={waku} onClickSend={sendMessage} />
         <button
           onClick={async () =>
@@ -103,13 +108,16 @@ export default App;
 
 const connectMetaMask = async (
   setWeb3: React.Dispatch<any>,
-  setUserLink: React.Dispatch<React.SetStateAction<string>>
+  setUserLink: React.Dispatch<React.SetStateAction<string>>,
+  setWeb3Chain: React.Dispatch<any>
 ) => {
   const w3 = await getWeb3();
   setWeb3(w3);
   const u = (await getAccount(w3)).toLowerCase();
   const link = "/?to=" + u;
   setUserLink(link);
+  const w3Chain = await getWeb3Chain(w3);
+  setWeb3Chain(w3Chain);
 };
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
