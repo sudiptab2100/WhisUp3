@@ -25,8 +25,9 @@ async function setPubKeyChain(contract: any, account: string, pubKey: string) {
 async function getPubKeyChain(contract: any, account: string) {
   if (contract) {
     const result = await contract.methods.getPubKey(account).call();
-    console.log(result);
+    return result;
   }
+  return null;
 }
 
 export { getWeb3Chain, getContract, setPubKeyChain, getPubKeyChain};

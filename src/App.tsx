@@ -24,6 +24,7 @@ function App() {
   const [web3, setWeb3] = useState<any>();
   const [web3Chain, setWeb3Chain] = useState<any>();
   const [pubKey, setPubKey] = useState<string>("");
+  const [toPubKey, setToPubKey] = useState<string>("");
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
   const [userLink, setUserLink] = useState("");
@@ -66,6 +67,9 @@ function App() {
         </h3>
         <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Get Pub Enc Key From MetaMask</button>
         <button onClick={async () => setPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5), pubKey)}>Publish On-Chain</button>
+        <br></br>
+        <button onClick={async () => setToPubKey(await getPubKeyChain(await getContract(web3Chain, contractAddress), to))}>Get To Pub Enc Key (On-Chain)</button>
+        <h4>To Public Enc. Key: {toPubKey}</h4>
         <SenderForm to={to} waku={waku} onClickSend={sendMessage} />
         <button
           onClick={async () =>
