@@ -28,9 +28,6 @@ function App() {
   const [status, setStatus] = useState<string>("Connecting...");
   const [messageComp, setMessageComp] = useState<any>();
   const [userLink, setUserLink] = useState("");
-  const [txt, setTxt] = useState("");
-  const [cipTxt, setCipTxt] = useState("");
-  const [decTxt, setDecTxt] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -55,21 +52,45 @@ function App() {
       <header className="App-header">
         <h1>WhisUp3</h1>
         <h2>{status}</h2>
-        <button onClick={async () => connectMetaMask(setWeb3, setUserLink, setWeb3Chain)}>
+        <button
+          onClick={async () =>
+            connectMetaMask(setWeb3, setUserLink, setWeb3Chain)
+          }
+        >
           Connect MetaMask
         </button>
-        <h4>User: {userLink.substring(5)}</h4>
-        <h3>
-          Link:{" "}
-          <a href={userLink} target="_blank">
-            Click
-          </a>
-        </h3>
-        <button onClick={async () => setPubKey(await getPublicKey(web3, userLink.substring(5)))}>Get Pub Enc Key From MetaMask</button>
-        <button onClick={async () => setPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5), pubKey)}>Publish On-Chain</button>
-        <br></br>
-        <button onClick={async () => setToPubKey(await getPubKeyChain(await getContract(web3Chain, contractAddress), userLink.substring(5)))}>Get Pub Enc Key (On-Chain)</button>
-        <h4>To Public Enc. Key: {toPubKey}</h4>
+        <h5>User: {userLink.substring(5)} <a href={userLink} target="_blank">(Go!)</a></h5>
+        <button
+          onClick={async () =>
+            setPubKey(await getPublicKey(web3, userLink.substring(5)))
+          }
+        >
+          Get Pub Enc Key From MetaMask
+        </button>
+        <button
+          onClick={async () =>
+            setPubKeyChain(
+              await getContract(web3Chain, contractAddress),
+              userLink.substring(5),
+              pubKey
+            )
+          }
+        >
+          Publish On-Chain
+        </button>
+        <button
+          onClick={async () =>
+            setToPubKey(
+              await getPubKeyChain(
+                await getContract(web3Chain, contractAddress),
+                userLink.substring(5)
+              )
+            )
+          }
+        >
+          Get Pub Enc Key (On-Chain)
+        </button>
+        <h5>To Public Enc. Key: {toPubKey}</h5>
         <SenderForm to={to} waku={waku} onClickSend={sendMessageEnc} />
         <button
           onClick={async () =>
@@ -79,30 +100,6 @@ function App() {
           Get Messages
         </button>
         <ul>{messageComp}</ul>
-        <button
-          onClick={async () =>
-            setPubKey(await getPublicKey(web3, userLink.substring(5)))
-          }
-        >
-          Set Public Key
-        </button>
-        <input
-          type="text"
-          id="message"
-          onChange={(e) => setTxt(e.target.value)}
-        />
-        <button onClick={async () => setCipTxt(await encryptEC(pubKey, txt))}>
-          Encrypt
-        </button>
-        <input type="text" id="cipher" value={cipTxt} />
-        <button
-          onClick={async () =>
-            setDecTxt(await decryptEC(web3, userLink.substring(5), cipTxt))
-          }
-        >
-          Decrypt
-        </button>
-        <input type="text" id="decrypted" value={decTxt} />
       </header>
     </div>
   );
@@ -117,6 +114,7 @@ const connectMetaMask = async (
 ) => {
   const w3 = await getWeb3();
   setWeb3(w3);
+  await switchChain(w3);
   const u = (await getAccount(w3)).toLowerCase();
   const link = "/?to=" + u;
   setUserLink(link);
@@ -128,15 +126,37 @@ const getStoredMessagesComponent = async (waku: LightNode) => {
   const w3 = await getWeb3();
   const user = (await getAccount(w3)).toLowerCase();
   const messagePairs = await getStoredMessage(waku, user!);
-  const listItems = messagePairs.map((message) => <li>{message.message}</li>);
+  const listItems = messagePairs.map((message, index) => (
+    <li>
+      <input
+        type="textbox"
+        id={"msg" + index.toString()}
+        value={message.message}
+      />
+      <button onClick={async () => await decMsgBox("msg" + index.toString())}>
+        Decrypt
+      </button>
+    </li>
+  ));
   return listItems;
 };
 
 const sendMessageEnc = async (waku: LightNode, to: string, txt: string) => {
   const web3Chain = await getWeb3Chain(await getWeb3());
   const contractAddress = "0xf44f4a08786BDD99A30b1765467f41b32650A6A4";
-  const toPubKey = await getPubKeyChain(await getContract(web3Chain, contractAddress), to);
+  const toPubKey = await getPubKeyChain(
+    await getContract(web3Chain, contractAddress),
+    to
+  );
   const cipTxt = await encryptEC(toPubKey, txt);
   const res = await sendMessage(waku, to, cipTxt);
   return res;
-}
+};
+
+const decMsgBox = async (boxId: string) => {
+  const w3 = await getWeb3();
+  const user = (await getAccount(w3)).toLowerCase();
+  const cipTxt = (document.getElementById(boxId) as HTMLInputElement).value;
+  const decTxt = await decryptEC(w3, user, cipTxt);
+  (document.getElementById(boxId) as HTMLInputElement).value = decTxt;
+};
