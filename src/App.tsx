@@ -25,17 +25,6 @@ function App() {
   const [decTxt, setDecTxt] = useState("");
 
   useEffect(() => {
-    const setuser = async () => {
-      const w3 = await getWeb3();
-      setWeb3(w3);
-      const u = (await getAccount(w3)).toLowerCase();
-      const link = "/?to=" + u;
-      setUserLink(link);
-    };
-    setuser();
-  });
-
-  useEffect(() => {
     const init = async () => {
       const node = await initWaku();
       if (node) {
@@ -43,6 +32,7 @@ function App() {
         setStatus("Connected");
       }
     };
+    connectMetaMask(setWeb3, setUserLink);
     init();
   });
 
@@ -101,6 +91,14 @@ function App() {
 }
 
 export default App;
+
+const connectMetaMask = async (setWeb3: React.Dispatch<any>, setUserLink: React.Dispatch<React.SetStateAction<string>>) => {
+  const w3 = await getWeb3();
+  setWeb3(w3);
+  const u = (await getAccount(w3)).toLowerCase();
+  const link = "/?to=" + u;
+  setUserLink(link);
+}
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
   const w3 = await getWeb3();
