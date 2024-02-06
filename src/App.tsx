@@ -38,7 +38,6 @@ function App() {
         setStatus("Connected");
       }
     };
-    connectMetaMask(setWeb3, setUserLink);
     init();
   });
 
@@ -52,6 +51,10 @@ function App() {
       <header className="App-header">
         <h1>WhisUp3</h1>
         <h2>{status}</h2>
+        <button onClick={async () => connectMetaMask(setWeb3, setUserLink)}>
+          Connect MetaMask
+        </button>
+        <h4>User: {userLink.substring(5)}</h4>
         <h3>
           Link:{" "}
           <a href={userLink} target="_blank">
