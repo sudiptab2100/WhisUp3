@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import {
-  initWaku,
-  sendMessage,
-  getStoredMessage
-} from "./components/Waku";
+import { initWaku, sendMessage, getStoredMessage } from "./components/Waku";
 import { LightNode } from "@waku/sdk";
 import SenderForm from "./components/SenderForm";
-import { getWeb3, getAccount, getPublicKey, switchChain } from "./components/MetaMask";
+import {
+  getWeb3,
+  getAccount,
+  getPublicKey,
+  switchChain,
+} from "./components/MetaMask";
 import { encryptEC, decryptEC } from "./components/Crypt";
-import { getWeb3Chain, getContract, setPubKeyChain, getPubKeyChain } from "./components/Web3Chain";
+import {
+  getWeb3Chain,
+  getContract,
+  setPubKeyChain,
+  getPubKeyChain,
+} from "./components/Web3Chain";
 
 function App() {
   const queryParameters = new URLSearchParams(window.location.search);
@@ -92,13 +98,16 @@ function App() {
 
 export default App;
 
-const connectMetaMask = async (setWeb3: React.Dispatch<any>, setUserLink: React.Dispatch<React.SetStateAction<string>>) => {
+const connectMetaMask = async (
+  setWeb3: React.Dispatch<any>,
+  setUserLink: React.Dispatch<React.SetStateAction<string>>
+) => {
   const w3 = await getWeb3();
   setWeb3(w3);
   const u = (await getAccount(w3)).toLowerCase();
   const link = "/?to=" + u;
   setUserLink(link);
-}
+};
 
 const getStoredMessagesComponent = async (waku: LightNode) => {
   const w3 = await getWeb3();
@@ -107,11 +116,12 @@ const getStoredMessagesComponent = async (waku: LightNode) => {
   const contract = await getContract(
     w3Chain,
     "0xf44f4a08786BDD99A30b1765467f41b32650A6A4"
-  ); console.log(contract);
+  );
+  console.log(contract);
   const user = (await getAccount(w3)).toLowerCase();
   const pk = await getPubKeyChain(contract, user);
   console.log(pk);
-  if(pk! === "") 
+  if (pk! === "")
     await setPubKeyChain(contract, user, await getPublicKey(w3, user));
   const messagePairs = await getStoredMessage(waku, user!);
   const listItems = messagePairs.map((message) => <li>{message.message}</li>);
