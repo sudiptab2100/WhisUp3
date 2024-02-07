@@ -40,11 +40,6 @@ function App() {
     init();
   });
 
-  // Account change reload
-  (window as any).ethereum.on("accountsChanged", () => {
-    window.location.reload();
-  });
-
   const contractAddress = "0xf44f4a08786BDD99A30b1765467f41b32650A6A4";
 
   return (
@@ -112,6 +107,11 @@ const connectMetaMask = async (
   setUserLink: React.Dispatch<React.SetStateAction<string>>,
   setWeb3Chain: React.Dispatch<any>
 ) => {
+  // Account change reload
+  (window as any).ethereum.on("accountsChanged", () => {
+    window.location.reload();
+  });
+  
   const w3 = await getWeb3();
   setWeb3(w3);
   await switchChain(w3);
