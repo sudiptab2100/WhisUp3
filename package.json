@@ -2,6 +2,7 @@
   "name": "whis-up-3",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://sudiptab2100.github.io/WhisUp3/",
   "dependencies": {
     "@metamask/eth-sig-util": "^7.0.1",
     "@testing-library/jest-dom": "^5.17.0",
