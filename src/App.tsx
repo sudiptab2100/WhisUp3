@@ -59,10 +59,10 @@ function App() {
         >
           Connect MetaMask
         </button>
-        <h5>User: {userLink.substring(5)} <a href={userLink} target="_blank">(Go!)</a></h5>
+        <h5>User: {userLink.slice(-42)} <a href={userLink} target="_blank">(Go!)</a></h5>
         <button
           onClick={async () =>
-            setPubKey(await getPublicKey(web3, userLink.substring(5)))
+            setPubKey(await getPublicKey(web3, userLink.slice(-42)))
           }
         >
           Get Pub Enc Key From MetaMask
@@ -71,7 +71,7 @@ function App() {
           onClick={async () =>
             setPubKeyChain(
               await getContract(web3Chain, contractAddress),
-              userLink.substring(5),
+              userLink.slice(-42),
               pubKey
             )
           }
@@ -83,7 +83,7 @@ function App() {
             setToPubKey(
               await getPubKeyChain(
                 await getContract(web3Chain, contractAddress),
-                userLink.substring(5)
+                userLink.slice(-42)
               )
             )
           }
@@ -116,7 +116,8 @@ const connectMetaMask = async (
   setWeb3(w3);
   await switchChain(w3);
   const u = (await getAccount(w3)).toLowerCase();
-  const link = "/?to=" + u;
+  const path = window.location.pathname;
+  const link = path + "?to=" + u;
   setUserLink(link);
   const w3Chain = await getWeb3Chain(w3);
   setWeb3Chain(w3Chain);
