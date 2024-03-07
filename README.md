@@ -1,3 +1,14 @@
+# WhisUp3 - Anonymous, Encrypted, Censorship Resistant Decentralised Feedbacks on Web3
+
+- Send / Receive Anonymous feedback messages over Public Wallet Addresses
+- Encrypt message using receiver's public key before sending which can be decrypted by receiver using his private key
+
+## Used Waku Protocol
+
+## React + TS 
+
+## MetaMask for message encryption
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
